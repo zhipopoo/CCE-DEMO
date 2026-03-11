@@ -1,0 +1,21 @@
+-- CCE Demo Database Initialization Script
+-- This script creates the users table based on the User entity
+
+USE ccedemo;
+
+-- Create users table
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert sample data
+INSERT INTO users (name, email, phone) VALUES
+('张三', 'zhangsan@example.com', '13800138000'),
+('李四', 'lisi@example.com', '13900139000'),
+('王五', 'wangwu@example.com', '13700137000');
