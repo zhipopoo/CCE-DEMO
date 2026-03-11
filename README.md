@@ -343,3 +343,8 @@ This project is for demonstration purposes.
 13.62 [ERROR] 
 13.62 [ERROR] For more information about the errors and possible solutions, please read the following articles:
 13.62 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+
+2026/03/11 08:19:06 [emerg] 1#1: host not found in upstream "backend-service" in /etc/nginx/conf.d/default.conf:13
+
+nginx: [emerg] host not found in upstream "backend-service" in /etc/nginx/conf.d/default.conf:13
