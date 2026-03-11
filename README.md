@@ -322,3 +322,24 @@ This project is for demonstration purposes.
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
+
+# Error Log
+3.61 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project cce-demo-backend: Compilation failure: Compilation failure: 
+13.61 [ERROR] /app/src/main/java/com/example/ccedemo/entity/User.java:[4,38] package jakarta.validation.constraints does not exist
+13.61 [ERROR] /app/src/main/java/com/example/ccedemo/entity/User.java:[5,38] package jakarta.validation.constraints does not exist
+13.61 [ERROR] /app/src/main/java/com/example/ccedemo/entity/User.java:[14,6] cannot find symbol
+13.61 [ERROR]   symbol:   class NotBlank
+13.61 [ERROR]   location: class com.example.ccedemo.entity.User
+13.61 [ERROR] /app/src/main/java/com/example/ccedemo/entity/User.java:[18,6] cannot find symbol
+13.61 [ERROR]   symbol:   class Email
+13.61 [ERROR]   location: class com.example.ccedemo.entity.User
+13.61 [ERROR] /app/src/main/java/com/example/ccedemo/entity/User.java:[19,6] cannot find symbol
+13.62 [ERROR]   symbol:   class NotBlank
+13.62 [ERROR]   location: class com.example.ccedemo.entity.User
+13.62 [ERROR] -> [Help 1]
+13.62 [ERROR] 
+13.62 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+13.62 [ERROR] Re-run Maven using the -X switch to enable full debug logging.
+13.62 [ERROR] 
+13.62 [ERROR] For more information about the errors and possible solutions, please read the following articles:
+13.62 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
