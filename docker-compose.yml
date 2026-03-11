@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cce-demo-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: cce-demo-password
+      MYSQL_DATABASE: ccedemo
+      MYSQL_USER: cceuser
+      MYSQL_PASSWORD: cceuser-password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - cce-demo-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cce-demo-backend
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ccedemo
+      DB_USER: cceuser
+      DB_PASSWORD: cceuser-password
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - cce-demo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cce-demo-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - cce-demo-network
+
+volumes:
+  mysql-data:
+
+networks:
+  cce-demo-network:
+    driver: bridge
