@@ -13,7 +13,8 @@ RUN npm run build
 FROM nginx:alpine
 
 COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Note: nginx.conf is now managed via Kubernetes ConfigMap
+# Do not copy nginx.conf here as it will be mounted via ConfigMap
 
 EXPOSE 80
 
