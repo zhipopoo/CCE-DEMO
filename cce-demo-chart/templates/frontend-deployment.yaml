@@ -20,6 +20,10 @@ spec:
         imagePullPolicy: {{ .Values.frontend.imagePullPolicy }}
         ports:
         - containerPort: 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
         resources:
           requests:
             memory: {{ .Values.frontend.resources.requests.memory }}
@@ -27,4 +31,8 @@ spec:
           limits:
             memory: {{ .Values.frontend.resources.limits.memory }}
             cpu: {{ .Values.frontend.resources.limits.cpu }}
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: frontend-nginx-config
 {{- end }}
