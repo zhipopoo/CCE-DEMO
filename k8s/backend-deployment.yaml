@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: cce-demo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: cce-demo-backend:latest
+        image: swr.ap-southeast-1.myhuaweicloud.com/andy-demo/cce-demo-backend:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -60,3 +60,5 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+      imagePullSecrets:
+        - name: default-secret

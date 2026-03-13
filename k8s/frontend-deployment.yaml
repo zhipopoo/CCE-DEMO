@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: cce-demo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: cce-demo-frontend:latest
+        image: swr.ap-southeast-1.myhuaweicloud.com/andy-demo/cce-demo-frontend:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
@@ -34,3 +34,5 @@ spec:
       - name: nginx-config
         configMap:
           name: frontend-nginx-config
+      imagePullSecrets:
+        - name: default-secret
