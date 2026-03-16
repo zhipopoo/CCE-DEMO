@@ -8,37 +8,41 @@ namespace:
   labels:
     app: cce-demo
 
+# Image pull secrets for private registry
+imagePullSecrets:
+  - name: default-secret
+
 # MySQL Configuration
 mysql:
   enabled: true
   image: mysql:8.0
   replicas: 1
-  
+
   auth:
     rootPassword: cce-demo-password
     username: cceuser
     password: cceuser-password
-  
+
   database: ccedemo
-  
+
   persistence:
     enabled: true
     size: 5Gi
     storageClass: csi-disk
     accessMode: ReadWriteOnce
-  
+
   service:
     type: ClusterIP
     port: 3306
-  
+
   resources: {}
-  
+
   livenessProbe:
     enabled: true
     initialDelaySeconds: 30
     periodSeconds: 10
     timeoutSeconds: 5
-  
+
   readinessProbe:
     enabled: true
     initialDelaySeconds: 5
@@ -48,14 +52,14 @@ mysql:
 # Backend Configuration
 backend:
   enabled: true
-  image: cce-demo-backend:latest
+  image: swr.ap-southeast-1.myhuaweicloud.com/andy-demo/cce-demo-backend:latest
   imagePullPolicy: IfNotPresent
-  replicas: 2
-  
+  replicas: 1
+
   service:
     type: ClusterIP
     port: 8080
-  
+
   resources:
     requests:
       memory: "256Mi"
@@ -63,7 +67,7 @@ backend:
     limits:
       memory: "512Mi"
       cpu: "500m"
-  
+
   livenessProbe:
     enabled: true
     path: /actuator/health
@@ -71,7 +75,7 @@ backend:
     initialDelaySeconds: 60
     periodSeconds: 10
     timeoutSeconds: 5
-  
+
   readinessProbe:
     enabled: true
     path: /actuator/health
@@ -83,9 +87,9 @@ backend:
 # Frontend Configuration
 frontend:
   enabled: true
-  image: cce-demo-frontend:latest
+  image: swr.ap-southeast-1.myhuaweicloud.com/andy-demo/cce-demo-frontend:latest
   imagePullPolicy: IfNotPresent
-  replicas: 2
+  replicas: 1
 
   service:
     type: LoadBalancer
