@@ -82,6 +82,10 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
                         sh '''
+                            # Ensure namespace exists
+                            kubectl --kubeconfig ${KUBECONFIG} get namespace ${KUBE_NAMESPACE} || \
+                            kubectl --kubeconfig ${KUBECONFIG} create namespace ${KUBE_NAMESPACE}
+
                             # Update Helm dependencies
                             helm dependency update ${HELM_CHART_PATH} || true
 
@@ -89,7 +93,6 @@ pipeline {
                             helm upgrade --install ${HELM_RELEASE} ${HELM_CHART_PATH} \
                                 --kubeconfig ${KUBECONFIG} \
                                 --namespace ${KUBE_NAMESPACE} \
-                                --create-namespace \
                                 --set backend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${BACKEND_IMAGE}:${IMAGE_TAG} \
                                 --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
                                 --wait \
