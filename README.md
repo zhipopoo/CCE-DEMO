@@ -1,6 +1,6 @@
-# CCE Demo - Microservice Application
+# CCE Demo - Cloud Container Engine Platform
 
-A complete microservice demo project designed for Huawei Cloud CCE (Cloud Container Engine) deployment, featuring React frontend, Spring Boot backend, and MySQL database.
+A complete cloud-native microservice demo project designed for Huawei Cloud CCE (Cloud Container Engine) deployment, featuring a professional business-style web interface with authentication, React frontend, Spring Boot backend, and MySQL database.
 
 ## Architecture
 
@@ -14,42 +14,89 @@ A complete microservice demo project designed for Huawei Cloud CCE (Cloud Contai
 
 ## Technology Stack
 
-- **Frontend**: React 18, Bootstrap 5, Axios
-- **Backend**: Spring Boot 3.2, Spring Data JPA, MySQL Connector
-- **Database**: MySQL 8.0
-- **Containerization**: Docker, Docker Compose
-- **Orchestration**: Kubernetes (Huawei Cloud CCE)
+### Frontend
+- **React 18** - Modern UI library
+- **Bootstrap 5** - Responsive design framework
+- **Axios** - HTTP client for API calls
+- **React Router** - Client-side routing
+- **Custom Theme System** - Unified business-style design
+
+### Backend
+- **Spring Boot 3.2** - Application framework
+- **Spring Data JPA** - Data persistence
+- **Spring Actuator** - Health checks and monitoring
+- **MySQL Connector 8.0.33** - Database driver
+- **Jakarta Validation** - Input validation
+
+### Infrastructure
+- **Docker** - Containerization
+- **Docker Compose** - Local development orchestration
+- **Kubernetes** - Container orchestration
+- **Helm** - Kubernetes package manager
+- **Huawei Cloud CCE** - Managed Kubernetes service
+- **SWR** - Container registry
 
 ## Features
 
+### Application Features
+- Professional login interface with authentication
+- Docker and Kubernetes technology showcase
 - Complete CRUD operations for user management
-- Responsive web interface with Bootstrap
-- Health checks and monitoring
+- Responsive web interface with business-style design
+- Chinese character support (UTF-8 encoding)
+- Session management with localStorage
+
+### Technical Features
+- Health checks and monitoring endpoints
 - Load balancing support
 - Persistent storage for database
 - Production-ready Docker images
 - Kubernetes manifests for CCE deployment
+- Helm chart for easy deployment
+- CI/CD pipeline with Jenkins
 
 ## Project Structure
 
 ```
 CCE-Demo/
-├── frontend/                # React frontend application
+├── frontend/                    # React frontend application
 │   ├── public/
+│   │   └── index.html          # HTML template
 │   ├── src/
-│   ├── Dockerfile
-│   └── nginx.conf
-├── backend/                 # Spring Boot backend application
+│   │   ├── components/         # React components
+│   │   │   ├── Login.js        # Login page component
+│   │   │   ├── Login.css       # Login page styles
+│   │   │   ├── Dashboard.js    # Dashboard component
+│   │   │   └── Dashboard.css   # Dashboard styles
+│   │   ├── App.js              # Main application
+│   │   ├── App.css             # App container styles
+│   │   ├── theme.css           # Shared theme variables
+│   │   └── index.js            # Entry point
+│   ├── Dockerfile              # Frontend container
+│   ├── nginx.conf              # Nginx configuration
+│   └── package.json            # Dependencies
+├── backend/                     # Spring Boot backend application
 │   ├── src/
-│   ├── Dockerfile
-│   └── pom.xml
-├── k8s/                     # Kubernetes manifests
-│   ├── namespace.yaml
-│   ├── mysql-*.yaml
-│   ├── backend-*.yaml
-│   └── frontend-*.yaml
-├── docker-compose.yml       # Local development setup
-└── README.md
+│   │   └── main/
+│   │       ├── java/           # Java source code
+│   │       └── resources/
+│   │           └── application.properties  # Configuration
+│   ├── Dockerfile              # Backend container
+│   └── pom.xml                 # Maven dependencies
+├── k8s/                         # Kubernetes manifests
+│   ├── namespace.yaml          # Namespace definition
+│   ├── mysql-*.yaml            # MySQL resources
+│   ├── backend-*.yaml          # Backend resources
+│   ├── frontend-*.yaml         # Frontend resources
+│   └── cce-demo-chart/         # Helm chart
+│       ├── Chart.yaml          # Chart metadata
+│       ├── values.yaml         # Default values
+│       └── templates/          # Template files
+├── mysql-init/                  # Database initialization
+│   └── 01-init.sql             # Init script with sample data
+├── docker-compose.yml           # Local development setup
+├── Jenkinsfile                  # CI/CD pipeline
+└── README.md                    # Documentation
 ```
 
 ## Local Development
@@ -80,7 +127,11 @@ docker-compose up -d
 - Backend API: http://localhost:8080/api/users
 - Backend Health: http://localhost:8080/actuator/health
 
-4. Stop all services:
+4. Login credentials:
+- Username: `admin`
+- Password: `admin123`
+
+5. Stop all services:
 ```bash
 docker-compose down
 ```
@@ -110,9 +161,13 @@ npm start
 1. Huawei Cloud account
 2. CCE cluster (Kubernetes 1.25+)
 3. kubectl configured to access your CCE cluster
-4. SWR (Software Container Registry) for image storage
+4. Helm 3.x installed
+5. SWR (Software Container Registry) for image storage
+6. Jenkins server (for CI/CD)
 
-### Step 1: Build and Push Docker Images
+### Method 1: Manual Deployment with kubectl
+
+#### Step 1: Build and Push Docker Images
 
 1. Build Docker images:
 ```bash
@@ -137,57 +192,67 @@ docker push <swr-endpoint>/<namespace>/cce-demo-backend:latest
 docker push <swr-endpoint>/<namespace>/cce-demo-frontend:latest
 ```
 
-### Step 2: Update Kubernetes Manifests
-
-Update the image names in `k8s/backend-deployment.yaml` and `k8s/frontend-deployment.yaml`:
-
-```yaml
-image: <swr-endpoint>/<namespace>/cce-demo-backend:latest
-image: <swr-endpoint>/<namespace>/cce-demo-frontend:latest
-```
-
-### Step 3: Deploy to CCE
+#### Step 2: Deploy to CCE
 
 1. Create namespace:
 ```bash
 kubectl apply -f k8s/namespace.yaml
 ```
 
-2. Create secrets and configmaps:
+2. Deploy all resources:
 ```bash
-kubectl apply -f k8s/mysql-secret.yaml
-kubectl apply -f k8s/mysql-configmap.yaml
+kubectl apply -f k8s/
 ```
 
-3. Create persistent volume claim:
-```bash
-kubectl apply -f k8s/mysql-pvc.yaml
-```
-
-4. Deploy MySQL:
-```bash
-kubectl apply -f k8s/mysql-deployment.yaml
-kubectl apply -f k8s/mysql-service.yaml
-```
-
-5. Wait for MySQL to be ready:
+3. Wait for deployments to be ready:
 ```bash
 kubectl wait --for=condition=ready pod -l app=mysql -n cce-demo --timeout=300s
+kubectl wait --for=condition=ready pod -l app=backend -n cce-demo --timeout=300s
+kubectl wait --for=condition=ready pod -l app=frontend -n cce-demo --timeout=300s
 ```
 
-6. Deploy backend:
+### Method 2: Deployment with Helm
+
+1. Update Helm values:
 ```bash
-kubectl apply -f k8s/backend-deployment.yaml
-kubectl apply -f k8s/backend-service.yaml
+# Edit k8s/cce-demo-chart/values.yaml
+# Update image repositories and other configurations
 ```
 
-7. Deploy frontend:
+2. Deploy with Helm:
 ```bash
-kubectl apply -f k8s/frontend-deployment.yaml
-kubectl apply -f k8s/frontend-service.yaml
+helm install cce-demo k8s/cce-demo-chart \
+  --namespace cce-demo \
+  --create-namespace \
+  --set backend.image=<swr-endpoint>/<namespace>/cce-demo-backend:latest \
+  --set frontend.image=<swr-endpoint>/<namespace>/cce-demo-frontend:latest
 ```
 
-### Step 4: Access the Application
+3. Upgrade deployment:
+```bash
+helm upgrade cce-demo k8s/cce-demo-chart \
+  --namespace cce-demo \
+  --set backend.image=<swr-endpoint>/<namespace>/cce-demo-backend:<new-tag> \
+  --set frontend.image=<swr-endpoint>/<namespace>/cce-demo-frontend:<new-tag>
+```
+
+### Method 3: CI/CD with Jenkins
+
+The project includes a Jenkinsfile for automated CI/CD:
+
+1. Configure Jenkins credentials:
+   - `docker-registry-credentials`: Docker registry username/password
+   - `kubeconfig-file`: Kubernetes configuration file
+
+2. Create a Jenkins pipeline using the Jenkinsfile
+
+3. The pipeline will:
+   - Build Docker images
+   - Push images to SWR
+   - Deploy to CCE using Helm
+   - Verify deployment status
+
+### Access the Application
 
 1. Get the external IP:
 ```bash
@@ -196,14 +261,16 @@ kubectl get svc frontend-service -n cce-demo
 
 2. Access the application using the EXTERNAL-IP
 
-### One-Command Deployment
-
-Deploy all resources at once:
-```bash
-kubectl apply -f k8s/
-```
+3. Login with credentials:
+   - Username: `admin`
+   - Password: `admin123`
 
 ## API Endpoints
+
+### Authentication
+
+- Login: `POST /login` (handled by frontend)
+- Logout: Clear localStorage (handled by frontend)
 
 ### User Management
 
@@ -233,7 +300,16 @@ kubectl apply -f k8s/
 
 #### Frontend
 
-- `REACT_APP_API_URL` - Backend API URL (default: http://localhost:8080/api)
+- `REACT_APP_API_URL` - Backend API URL (default: /api)
+
+### Database Configuration
+
+The database is configured with UTF-8 support for Chinese characters:
+- Character set: `utf8mb4`
+- Collation: `utf8mb4_unicode_ci`
+- Connection encoding: `UTF-8`
+
+Sample data includes Chinese names (张三, 李四, 王五).
 
 ## Monitoring and Logging
 
@@ -276,16 +352,30 @@ kubectl scale deployment frontend --replicas=3 -n cce-demo
    - Check if MySQL is running: `kubectl get pods -n cce-demo`
    - Check MySQL logs: `kubectl logs deployment/mysql -n cce-demo`
    - Verify secrets and configmaps
+   - Check PVC status: `kubectl get pvc -n cce-demo`
 
 2. **Frontend Cannot Connect to Backend**
    - Check backend service: `kubectl get svc backend-service -n cce-demo`
    - Check backend pods: `kubectl get pods -l app=backend -n cce-demo`
    - Verify network policies
+   - Check nginx configuration
 
 3. **Image Pull Errors**
    - Verify image exists in SWR
    - Check image pull secrets
    - Verify image name and tag
+   - Ensure proper authentication
+
+4. **Chinese Character Encoding Issues**
+   - Database uses utf8mb4 charset
+   - Backend configured with UTF-8 encoding
+   - Frontend has UTF-8 meta charset
+   - Nginx configured with UTF-8 charset
+
+5. **Helm Deployment Fails**
+   - Check Helm release status: `helm list -n cce-demo`
+   - View Helm history: `helm history cce-demo -n cce-demo`
+   - Rollback if needed: `helm rollback cce-demo <revision> -n cce-demo`
 
 ### Useful Commands
 
@@ -301,25 +391,71 @@ kubectl exec -it <pod-name> -n cce-demo -- /bin/sh
 
 # Port forward for local access
 kubectl port-forward svc/backend-service 8080:8080 -n cce-demo
+
+# Check events
+kubectl get events -n cce-demo --sort-by='.metadata.creationTimestamp'
+
+# View resource usage
+kubectl top pods -n cce-demo
 ```
 
 ## Security Considerations
 
-1. Change default passwords in production
-2. Use Kubernetes secrets for sensitive data
-3. Configure network policies
-4. Enable RBAC
-5. Use HTTPS/TLS for production
+1. **Authentication**: Change default login credentials in production
+2. **Database**: Change default passwords in production
+3. **Secrets**: Use Kubernetes secrets for sensitive data
+4. **Network**: Configure network policies
+5. **RBAC**: Enable Role-Based Access Control
+6. **TLS**: Use HTTPS/TLS for production
+7. **Image Security**: Scan images for vulnerabilities
+8. **Updates**: Keep dependencies updated
+
+## Performance Optimization
+
+### Frontend
+- Production build with minification
+- Nginx for static file serving
+- Gzip compression enabled
+- Proper caching headers
+
+### Backend
+- Connection pooling with HikariCP
+- JPA optimization
+- Actuator metrics for monitoring
+
+### Database
+- Proper indexing on frequently queried fields
+- Connection pooling
+- Persistent volume for data durability
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Create a Pull Request
 
 ## License
 
 This project is for demonstration purposes.
 
-## Contributing
+## Support
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+For issues and questions:
+1. Check the Troubleshooting section
+2. Review Kubernetes events and logs
+3. Consult Huawei Cloud CCE documentation
+4. Open an issue in the repository
 
+## Changelog
+
+### Version 1.0.0
+- Initial release
+- Professional login interface
+- Docker and Kubernetes showcase
+- User management CRUD operations
+- Chinese character support
+- Helm chart for deployment
+- CI/CD pipeline with Jenkins
+- Comprehensive documentation
