@@ -1,0 +1,270 @@
+/* Login Page Styles */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-container {
+  display: flex;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  max-width: 1200px;
+  width: 100%;
+  min-height: 600px;
+}
+
+.login-left {
+  flex: 1;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  padding: 60px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+}
+
+.login-header {
+  margin-bottom: 50px;
+}
+
+.logo-container {
+  text-align: center;
+}
+
+.logo-icon {
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.login-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.tech-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.tech-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tech-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(5px);
+}
+
+.tech-icon {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tech-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.tech-card p {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 50px;
+  background: #ffffff;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-form-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.login-form-header p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  color: #94a3b8;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.input-group .form-control {
+  padding-left: 45px;
+  height: 50px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-group .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-login {
+  height: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-login:disabled {
+  opacity: 0.7;
+  transform: none;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.login-footer p {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Responsive Design for Login */
+@media (max-width: 992px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-left {
+    padding: 40px 30px;
+  }
+
+  .login-right {
+    padding: 40px 30px;
+  }
+
+  .login-header h1 {
+    font-size: 2rem;
+  }
+
+  .tech-intro {
+    gap: 15px;
+  }
+
+  .tech-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-page {
+    padding: 10px;
+  }
+
+  .login-container {
+    border-radius: 15px;
+  }
+
+  .login-left {
+    padding: 30px 20px;
+  }
+
+  .login-right {
+    padding: 30px 20px;
+  }
+
+  .login-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .tech-card h3 {
+    font-size: 1rem;
+  }
+
+  .tech-card p {
+    font-size: 0.85rem;
+  }
+}
