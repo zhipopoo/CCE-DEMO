@@ -23,6 +23,23 @@ pipeline {
             }
         }
 
+        stage('Docker Login') {
+            steps {
+                echo 'Logging in to Docker registry...'
+                script {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'docker-registry-credentials',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )]) {
+                        sh '''
+                            docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} ${DOCKER_REGISTRY}
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Build Backend') {
             steps {
                 echo 'Building backend Docker image...'
@@ -93,23 +110,28 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh '''
-                docker image prune -f
-            '''
+            script {
+                try {
+                    sh 'docker logout ${DOCKER_REGISTRY} || true'
+                    sh 'docker image prune -f || true'
+                } catch (Exception e) {
+                    echo 'Docker cleanup skipped'
+                }
+            }
         }
         success {
             echo 'Deployment successful!'
             sh '''
                 echo "Application deployed successfully!"
-                kubectl get pods -n ${KUBE_NAMESPACE}
+                kubectl get pods -n ${KUBE_NAMESPACE} || true
             '''
         }
         failure {
             echo 'Deployment failed!'
             sh '''
                 echo "Checking pod status for debugging..."
-                kubectl get pods -n ${KUBE_NAMESPACE}
-                kubectl describe pods -n ${KUBE_NAMESPACE} | tail -100
+                kubectl get pods -n ${KUBE_NAMESPACE} || true
+                kubectl describe pods -n ${KUBE_NAMESPACE} | tail -100 || true
             '''
         }
     }
