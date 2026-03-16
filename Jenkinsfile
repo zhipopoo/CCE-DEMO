@@ -89,6 +89,9 @@ pipeline {
                             # Update Helm dependencies
                             helm dependency update ${HELM_CHART_PATH} || true
 
+                            # Check for failed Helm releases and clean them up
+                            helm list --kubeconfig ${KUBECONFIG} --namespace ${KUBE_NAMESPACE} --all
+
                             # Deploy using Helm
                             # For CI runs we default the frontend service to ClusterIP to avoid long LoadBalancer provisioning
                             helm upgrade --install ${HELM_RELEASE} ${HELM_CHART_PATH} \
@@ -98,7 +101,19 @@ pipeline {
                                 --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
                                 --set frontend.service.type=ClusterIP \
                                 --wait \
-                                --timeout 10m
+                                --timeout 10m || {
+                                    # If upgrade fails, try to uninstall and reinstall
+                                    echo "Helm upgrade failed, attempting clean install..."
+                                    helm uninstall ${HELM_RELEASE} --kubeconfig ${KUBECONFIG} --namespace ${KUBE_NAMESPACE} || true
+                                    helm install ${HELM_RELEASE} ${HELM_CHART_PATH} \
+                                        --kubeconfig ${KUBECONFIG} \
+                                        --namespace ${KUBE_NAMESPACE} \
+                                        --set backend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${BACKEND_IMAGE}:${IMAGE_TAG} \
+                                        --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
+                                        --set frontend.service.type=ClusterIP \
+                                        --wait \
+                                        --timeout 10m
+                                }
                         '''
                     }
                 }
