@@ -79,30 +79,39 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 echo 'Deploying to Kubernetes using Helm...'
-                sh '''
-                    # Update Helm dependencies
-                    helm dependency update ${HELM_CHART_PATH}
+                script {
+                    withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                        sh '''
+                            # Update Helm dependencies
+                            helm dependency update ${HELM_CHART_PATH} || true
 
-                    # Deploy using Helm
-                    helm upgrade --install ${HELM_RELEASE} ${HELM_CHART_PATH} \
-                        --namespace ${KUBE_NAMESPACE} \
-                        --create-namespace \
-                        --set backend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${BACKEND_IMAGE}:${IMAGE_TAG} \
-                        --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
-                        --wait \
-                        --timeout 5m
-                '''
+                            # Deploy using Helm
+                            helm upgrade --install ${HELM_RELEASE} ${HELM_CHART_PATH} \
+                                --kubeconfig ${KUBECONFIG} \
+                                --namespace ${KUBE_NAMESPACE} \
+                                --create-namespace \
+                                --set backend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${BACKEND_IMAGE}:${IMAGE_TAG} \
+                                --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
+                                --wait \
+                                --timeout 5m
+                        '''
+                    }
+                }
             }
         }
 
         stage('Verify Deployment') {
             steps {
                 echo 'Verifying deployment...'
-                sh '''
-                    kubectl get pods -n ${KUBE_NAMESPACE}
-                    kubectl get services -n ${KUBE_NAMESPACE}
-                    kubectl get ingress -n ${KUBE_NAMESPACE}
-                '''
+                script {
+                    withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                        sh '''
+                            kubectl --kubeconfig ${KUBECONFIG} get pods -n ${KUBE_NAMESPACE}
+                            kubectl --kubeconfig ${KUBECONFIG} get services -n ${KUBE_NAMESPACE}
+                            kubectl --kubeconfig ${KUBECONFIG} get ingress -n ${KUBE_NAMESPACE} || true
+                        '''
+                    }
+                }
             }
         }
     }
@@ -121,18 +130,26 @@ pipeline {
         }
         success {
             echo 'Deployment successful!'
-            sh '''
-                echo "Application deployed successfully!"
-                kubectl get pods -n ${KUBE_NAMESPACE} || true
-            '''
+            script {
+                withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                    sh '''
+                        echo "Application deployed successfully!"
+                        kubectl --kubeconfig ${KUBECONFIG} get pods -n ${KUBE_NAMESPACE} || true
+                    '''
+                }
+            }
         }
         failure {
             echo 'Deployment failed!'
-            sh '''
-                echo "Checking pod status for debugging..."
-                kubectl get pods -n ${KUBE_NAMESPACE} || true
-                kubectl describe pods -n ${KUBE_NAMESPACE} | tail -100 || true
-            '''
+            script {
+                withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                    sh '''
+                        echo "Checking pod status for debugging..."
+                        kubectl --kubeconfig ${KUBECONFIG} get pods -n ${KUBE_NAMESPACE} || true
+                        kubectl --kubeconfig ${KUBECONFIG} describe pods -n ${KUBE_NAMESPACE} | tail -100 || true
+                    '''
+                }
+            }
         }
     }
 }
