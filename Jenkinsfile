@@ -90,13 +90,15 @@ pipeline {
                             helm dependency update ${HELM_CHART_PATH} || true
 
                             # Deploy using Helm
+                            # For CI runs we default the frontend service to ClusterIP to avoid long LoadBalancer provisioning
                             helm upgrade --install ${HELM_RELEASE} ${HELM_CHART_PATH} \
                                 --kubeconfig ${KUBECONFIG} \
                                 --namespace ${KUBE_NAMESPACE} \
                                 --set backend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${BACKEND_IMAGE}:${IMAGE_TAG} \
                                 --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
+                                --set frontend.service.type=ClusterIP \
                                 --wait \
-                                --timeout 5m
+                                --timeout 10m
                         '''
                     }
                 }
@@ -149,7 +151,15 @@ pipeline {
                     sh '''
                         echo "Checking pod status for debugging..."
                         kubectl --kubeconfig ${KUBECONFIG} get pods -n ${KUBE_NAMESPACE} || true
-                        kubectl --kubeconfig ${KUBECONFIG} describe pods -n ${KUBE_NAMESPACE} | tail -100 || true
+                        kubectl --kubeconfig ${KUBECONFIG} describe pods -n ${KUBE_NAMESPACE} | tail -200 || true
+                        echo "\n-- Services --"
+                        kubectl --kubeconfig ${KUBECONFIG} get svc -n ${KUBE_NAMESPACE} || true
+                        kubectl --kubeconfig ${KUBECONFIG} describe svc -n ${KUBE_NAMESPACE} || true
+                        echo "\n-- Events --"
+                        kubectl --kubeconfig ${KUBECONFIG} get events -n ${KUBE_NAMESPACE} --sort-by='.metadata.creationTimestamp' || true
+                        echo "\n-- PVCs --"
+                        kubectl --kubeconfig ${KUBECONFIG} get pvc -n ${KUBE_NAMESPACE} || true
+                        kubectl --kubeconfig ${KUBECONFIG} describe pvc -n ${KUBE_NAMESPACE} || true
                     '''
                 }
             }
