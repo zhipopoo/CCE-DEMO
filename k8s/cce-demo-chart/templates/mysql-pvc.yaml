@@ -1,14 +1,11 @@
 {{- if .Values.mysql.persistence.enabled }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pvc
-  namespace: {{ .Values.namespace.name }}
-spec:
-  accessModes:
-    - {{ .Values.mysql.persistence.accessMode }}
-  resources:
-    requests:
-      storage: {{ .Values.mysql.persistence.size }}
-  storageClassName: {{ .Values.mysql.persistence.storageClass }}
+# Note: PVC is now managed by StatefulSet volumeClaimTemplates
+# This file is kept for reference and manual PVC creation if needed
+#
+# For StatefulSet deployment, PVCs are automatically created with the pattern:
+# <pvc-name>-<statefulset-name>-<ordinal>
+# Example: mysql-persistent-storage-mysql-0
+#
+# The volumeClaimTemplates in mysql-deployment.yaml will create PVCs automatically.
+# No need to create PVCs separately when using StatefulSet.
 {{- end }}

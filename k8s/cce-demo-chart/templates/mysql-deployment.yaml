@@ -1,26 +1,41 @@
 {{- if .Values.mysql.enabled }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: mysql
   namespace: {{ .Values.namespace.name }}
+  labels:
+    app: mysql
+    component: database
 spec:
+  serviceName: mysql-service
   replicas: {{ .Values.mysql.replicas }}
   selector:
     matchLabels:
       app: mysql
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
         app: mysql
+        component: database
     spec:
+      # Use init container to ensure proper permissions
+      initContainers:
+      - name: init-mysql
+        image: busybox:1.35
+        command: ['sh', '-c', 'mkdir -p /var/lib/mysql/mysql && chown -R 999:999 /var/lib/mysql']
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+
       containers:
       - name: mysql
         image: {{ .Values.mysql.image }}
         ports:
         - containerPort: 3306
+          name: mysql
+          protocol: TCP
+
         env:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
@@ -42,44 +57,80 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: mysql-password
+
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
+          subPath: mysql
         - name: mysql-init-scripts
           mountPath: /docker-entrypoint-initdb.d
+          readOnly: true
+
         {{- if .Values.mysql.livenessProbe.enabled }}
+        # Liveness probe - check if MySQL is running
         livenessProbe:
           exec:
             command:
-            - mysqladmin
-            - ping
-            - -h
-            - localhost
+            - sh
+            - -c
+            - "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}"
           initialDelaySeconds: {{ .Values.mysql.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.mysql.livenessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.mysql.livenessProbe.timeoutSeconds }}
+          failureThreshold: 3
         {{- end }}
+
         {{- if .Values.mysql.readinessProbe.enabled }}
+        # Readiness probe - check if MySQL is ready to accept connections
         readinessProbe:
           exec:
             command:
-            - mysqladmin
-            - ping
-            - -h
-            - localhost
+            - sh
+            - -c
+            - "mysql -h 127.0.0.1 -u root -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1'"
           initialDelaySeconds: {{ .Values.mysql.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.mysql.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.mysql.readinessProbe.timeoutSeconds }}
+          failureThreshold: 3
         {{- end }}
+
+        # Resource limits and requests
         {{- with .Values.mysql.resources }}
         resources:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+
+        # Security context
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
+          allowPrivilegeEscalation: false
+
+      # Pod security context
+      securityContext:
+        fsGroup: 999
+
+      # Volumes
       volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-pvc
       - name: mysql-init-scripts
         configMap:
           name: mysql-init-script
+          defaultMode: 0755
+
+  # Volume claim template for persistent storage
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-persistent-storage
+      labels:
+        app: mysql
+        component: database
+    spec:
+      accessModes:
+        - {{ .Values.mysql.persistence.accessMode }}
+      resources:
+        requests:
+          storage: {{ .Values.mysql.persistence.size }}
+      {{- if .Values.mysql.persistence.storageClass }}
+      storageClassName: {{ .Values.mysql.persistence.storageClass }}
+      {{- end }}
 {{- end }}
