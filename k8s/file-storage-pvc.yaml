@@ -1,5 +1,5 @@
 # OBS Storage PVC for Huawei Cloud CCE
-# Using OBS with AK/SK credentials
+# Using OBS with AK/SK (pre-created secret)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -22,14 +22,3 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: csi-obs
----
-# OBS Credentials Secret
-apiVersion: v1
-kind: Secret
-metadata:
-  name: obs-credentials
-  namespace: cce-demo
-type: Opaque
-stringData:
-  access-key: YOUR_OBS_ACCESS_KEY
-  secret-key: YOUR_OBS_SECRET_KEY
