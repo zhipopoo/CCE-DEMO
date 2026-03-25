@@ -112,7 +112,7 @@ frontend:
 # File Storage Configuration
 fileStorage:
   # Mount type: "local" or "obs"
-  mountType: "obs"
+  mountType: "local"
   
   # Local storage configuration (for docker-compose or single node k8s)
   local:
