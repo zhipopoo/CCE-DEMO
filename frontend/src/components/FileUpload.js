@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import './FileUpload.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 function FileUpload() {
+  const { t } = useTranslation();
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -131,16 +133,16 @@ function FileUpload() {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
             </svg>
-            <span>存储挂载信息</span>
-            <span className="mount-type-badge">{mountInfo.mountType === 'obs' ? 'OBS' : '本地'}</span>
+            <span>{t('mount.title')}</span>
+            <span className="mount-type-badge">{mountInfo.mountType === 'obs' ? t('mount.obs') : t('mount.local')}</span>
           </div>
           <div className="mount-info-body">
             <div className="mount-info-item">
-              <span className="label">挂载类型:</span>
-              <span className="value">{mountInfo.mountType === 'obs' ? '华为云OBS对象存储' : '本地文件系统'}</span>
+              <span className="label">{t("mount.type")}:</span>
+              <span className="value">{mountInfo.mountType === 'obs' ? t("mount.obs") : "Local File System"}</span>
             </div>
             <div className="mount-info-item">
-              <span className="label">存储路径:</span>
+              <span className="label">{t("mount.path")}:</span>
               <span className="value">{mountInfo.uploadDir}</span>
             </div>
             {mountInfo.absolutePath && (
@@ -155,7 +157,7 @@ function FileUpload() {
 
       {/* Upload Section */}
       <div className="upload-section">
-        <h5>上传文件</h5>
+        <h5>{t('file.upload')}</h5>
         <div className="upload-area">
           <input
             type="file"
@@ -167,7 +169,7 @@ function FileUpload() {
             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
             </svg>
-            <span>{selectedFile ? selectedFile.name : '点击选择文件或拖拽到此处'}</span>
+            <span>{selectedFile ? selectedFile.name : t('file.selectFile')}</span>
             {selectedFile && (
               <span className="file-size">{formatFileSize(selectedFile.size)}</span>
             )}
@@ -189,7 +191,7 @@ function FileUpload() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="me-2">
                 <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
               </svg>
-              上传
+              {t('file.uploadBtn')}
             </>
           )}
         </button>
@@ -206,12 +208,12 @@ function FileUpload() {
       {/* File List */}
       <div className="file-list-section">
         <div className="file-list-header">
-          <h5>文件列表</h5>
+          <h5>{t('file.list')}</h5>
           <button className="btn btn-sm btn-outline-primary" onClick={fetchFiles}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-1">
               <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
             </svg>
-            刷新
+            t('file.refresh')
           </button>
         </div>
         
@@ -226,17 +228,17 @@ function FileUpload() {
             <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
             </svg>
-            <p>暂无上传文件</p>
+            <p>t('file.noFiles')</p>
           </div>
         ) : (
           <div className="table-responsive">
             <table className="table table-hover">
               <thead className="table-light">
                 <tr>
-                  <th>文件名</th>
-                  <th>大小</th>
-                  <th>上传时间</th>
-                  <th>操作</th>
+                  <th>{t('file.filename')}</th>
+                  <th>{t('file.size')}</th>
+                  <th>{t('file.uploadTime')}</th>
+                  <th>{t('user.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -255,13 +257,13 @@ function FileUpload() {
                         className="btn btn-sm btn-primary me-2"
                         onClick={() => handleDownload(file.filename)}
                       >
-                        下载
+                        t('file.download')
                       </button>
                       <button
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDelete(file.filename)}
                       >
-                        删除
+                        t('file.delete')
                       </button>
                     </td>
                   </tr>

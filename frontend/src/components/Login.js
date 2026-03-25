@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Login.css';
 
 function Login({ onLogin }) {
+  const { t } = useTranslation();
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +19,7 @@ function Login({ onLogin }) {
       localStorage.setItem('username', credentials.username);
       onLogin(true);
     } else {
-      setError('Invalid username or password');
+      setError(t('login.error'));
     }
     setLoading(false);
   };
@@ -43,8 +45,8 @@ function Login({ onLogin }) {
                   <circle cx="30" cy="30" r="8" fill="#2563eb"/>
                 </svg>
               </div>
-              <h1>CCE Demo Platform</h1>
-              <p className="subtitle">Cloud Container Engine Management System</p>
+              <h1>t('login.title')</h1>
+              <p className="subtitle">t('login.subtitle')</p>
             </div>
           </div>
 
@@ -95,8 +97,8 @@ function Login({ onLogin }) {
         <div className="login-right">
           <div className="login-form-container">
             <div className="login-form-header">
-              <h2>Welcome Back</h2>
-              <p>Sign in to access your dashboard</p>
+              <h2>t('login.welcome')</h2>
+              <p>t('login.signIn')</p>
             </div>
 
             {error && (
@@ -121,7 +123,7 @@ function Login({ onLogin }) {
                     name="username"
                     value={credentials.username}
                     onChange={handleChange}
-                    placeholder="Enter your username"
+                    placeholder="t('login.username')"
                     required
                   />
                 </div>
@@ -142,18 +144,18 @@ function Login({ onLogin }) {
                     name="password"
                     value={credentials.password}
                     onChange={handleChange}
-                    placeholder="Enter your password"
+                    placeholder="t('login.password')"
                     required
                   />
                 </div>
               </div>
 
               <button type="submit" className="btn btn-primary btn-login" disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? t('login.signingIn') : t('login.signInBtn')}
               </button>
 
               <div className="login-footer">
-                <p>Demo credentials: admin / admin123</p>
+                <p>t('login.demo')</p>
               </div>
             </form>
           </div>

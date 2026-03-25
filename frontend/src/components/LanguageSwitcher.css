@@ -1,0 +1,15 @@
+.language-switcher {
+  display: inline-flex;
+  margin-right: 15px;
+}
+
+.language-switcher .btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.language-switcher .btn-light {
+  background-color: #fff;
+  color: #333;
+}

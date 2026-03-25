@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 import axios from 'axios';
 import FileUpload from './FileUpload';
 import './Dashboard.css';
@@ -6,6 +8,7 @@ import './Dashboard.css';
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 function Dashboard({ onLogout, username }) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [activeTab, setActiveTab] = useState('users');
   const [formData, setFormData] = useState({
@@ -119,10 +122,11 @@ function Dashboard({ onLogout, username }) {
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="user-icon">
                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
               </svg>
-              Welcome, {username}
+              {t('nav.welcome')}, {username}
             </span>
+            <LanguageSwitcher />
             <button className="btn btn-outline-light btn-sm logout-btn" onClick={handleLogout}>
-              Logout
+              {t('nav.logout')}
             </button>
           </div>
         </div>
@@ -136,10 +140,7 @@ function Dashboard({ onLogout, username }) {
               className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
               onClick={() => setActiveTab('users')}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="me-2">
-                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-              </svg>
-              用户管理
+              {t('nav.welcome')}, {username}
             </button>
           </li>
           <li className="nav-item">
@@ -150,7 +151,7 @@ function Dashboard({ onLogout, username }) {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="me-2">
                 <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
               </svg>
-              文件管理
+              {t('file.title')}
             </button>
           </li>
         </ul>
@@ -171,13 +172,13 @@ function Dashboard({ onLogout, username }) {
             <div className="card professional-card">
               <div className="card-header">
                 <h5 className="mb-0">
-                  {editingId ? 'Edit User' : 'Add New User'}
+                  {editingId ? t('user.edit') : t('user.addNew')}
                 </h5>
               </div>
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label className="form-label">Name</label>
+                    <label className="form-label">{t('user.name')}</label>
                     <input
                       type="text"
                       className="form-control"
@@ -188,7 +189,7 @@ function Dashboard({ onLogout, username }) {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Email</label>
+                    <label className="form-label">{t('user.email')}</label>
                     <input
                       type="email"
                       className="form-control"
@@ -199,7 +200,7 @@ function Dashboard({ onLogout, username }) {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Phone</label>
+                    <label className="form-label">{t('user.phone')}</label>
                     <input
                       type="tel"
                       className="form-control"
@@ -214,7 +215,7 @@ function Dashboard({ onLogout, username }) {
                       className="btn btn-primary"
                       disabled={loading}
                     >
-                      {loading ? 'Processing...' : (editingId ? 'Update' : 'Create')}
+                      {loading ? t('common.loading') : (editingId ? t('user.updated').split('!')[0] : t('user.created').split('!')[0])}
                     </button>
                     {editingId && (
                       <button
@@ -222,7 +223,7 @@ function Dashboard({ onLogout, username }) {
                         className="btn btn-secondary"
                         onClick={handleCancel}
                       >
-                        Cancel
+                        t('user.cancel')
                       </button>
                     )}
                   </div>
@@ -234,7 +235,7 @@ function Dashboard({ onLogout, username }) {
           <div className="col-md-8">
             <div className="card professional-card">
               <div className="card-header">
-                <h5 className="mb-0">User List</h5>
+                <h5 className="mb-0">{t('user.title')}</h5>
               </div>
               <div className="card-body">
                 {loading ? (
@@ -249,17 +250,17 @@ function Dashboard({ onLogout, username }) {
                       <thead className="table-light">
                         <tr>
                           <th>ID</th>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Actions</th>
+                          <th>{t('user.name')}</th>
+                          <th>{t('user.email')}</th>
+                          <th>{t('user.phone')}</th>
+                          <th>{t('user.actions')}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {users.length === 0 ? (
                           <tr>
                             <td colSpan="5" className="text-center">
-                              No users found
+                              t('user.noUsers')
                             </td>
                           </tr>
                         ) : (
@@ -274,13 +275,13 @@ function Dashboard({ onLogout, username }) {
                                   className="btn btn-sm btn-info me-2"
                                   onClick={() => handleEdit(user)}
                                 >
-                                  Edit
+                                  {t('user.editBtn')}
                                 </button>
                                 <button
                                   className="btn btn-sm btn-danger"
                                   onClick={() => handleDelete(user.id)}
                                 >
-                                  Delete
+                                  {t('user.deleteBtn')}
                                 </button>
                               </td>
                             </tr>
