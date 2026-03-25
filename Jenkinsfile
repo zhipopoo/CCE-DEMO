@@ -95,15 +95,19 @@ pipeline {
 
                             # Create OBS credentials secret with base64 encoding
                             # Secret type: cfe/secure-opaque
-                            # Labels: secret.kubernetes.io/used-by: csi
                             # Data keys: access.key, secret.key (base64 encoded)
+                            # Labels added via kubectl label command
                             kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
                                 --namespace ${KUBE_NAMESPACE} \
                                 --from-literal=access.key=$(echo -n ${OBS_ACCESS_KEY} | base64) \
                                 --from-literal=secret.key=$(echo -n ${OBS_SECRET_KEY} | base64) \
-                                --labels=secret.kubernetes.io/used-by=csi \
                                 --type=cfe/secure-opaque \
                                 --dry-run=client -o yaml | kubectl --kubeconfig ${KUBECONFIG} apply -f -
+                            
+                            # Add label to secret
+                            kubectl --kubeconfig ${KUBECONFIG} label secret obs-credentials \
+                                --namespace ${KUBE_NAMESPACE} \
+                                secret.kubernetes.io/used-by=csi || true
 
                             # Update Helm dependencies
                             helm dependency update ${HELM_CHART_PATH} || true
