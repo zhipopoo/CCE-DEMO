@@ -44,26 +44,8 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: mysql-password
-        {{- if .Values.fileStorage.mountType }}
         - name: FILE_MOUNT_TYPE
           value: {{ .Values.fileStorage.mountType }}
-        {{- end }}
-        {{- if .Values.fileStorage.mountType }}
-        - name: OBS_BUCKET
-          value: {{ .Values.fileStorage.obs.bucket }}
-        - name: OBS_ENDPOINT
-          value: {{ .Values.fileStorage.obs.endpoint }}
-        - name: OBS_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.fileStorage.obs.secretName }}
-              key: access-key
-        - name: OBS_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.fileStorage.obs.secretName }}
-              key: secret-key
-        {{- end }}
         volumeMounts:
         {{- if eq .Values.fileStorage.mountType "obs" }}
         - name: obs-storage
