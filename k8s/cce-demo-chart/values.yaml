@@ -125,7 +125,4 @@ fileStorage:
     volumeType: "STANDARD"
     volumeNamePrefix: "cce-demo"
     secretName: "obs-credentials"
-    capacity: "1Gi"
-    volumeType: "STANDARD"
-    volumeNamePrefix: "cce-demo"
    

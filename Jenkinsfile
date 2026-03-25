@@ -94,6 +94,9 @@ pipeline {
                             kubectl --kubeconfig ${KUBECONFIG} create namespace ${KUBE_NAMESPACE}
 
                             # Create OBS credentials secret with base64 encoding
+                            # Secret type: cfe/secure-opaque
+                            # Labels: secret.kubernetes.io/used-by: csi
+                            # Data keys: access.key, secret.key (base64 encoded)
                             kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
                                 --namespace ${KUBE_NAMESPACE} \
                                 --from-literal=access.key=$(echo -n ${OBS_ACCESS_KEY} | base64) \
