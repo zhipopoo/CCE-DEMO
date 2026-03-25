@@ -30,7 +30,7 @@ function Dashboard({ onLogout, username }) {
       const response = await axios.get(`${API_BASE_URL}/users`);
       setUsers(response.data);
     } catch (error) {
-      showMessage('Failed to fetch users: ' + error.message, 'danger');
+      showMessage(t('user.fetchFailed') + ': ' + error.message, 'danger');
     } finally {
       setLoading(false);
     }
@@ -42,16 +42,16 @@ function Dashboard({ onLogout, username }) {
     try {
       if (editingId) {
         await axios.put(`${API_BASE_URL}/users/${editingId}`, formData);
-        showMessage('User updated successfully!', 'success');
+        showMessage(t('user.updated'), 'success');
       } else {
         await axios.post(`${API_BASE_URL}/users`, formData);
-        showMessage('User created successfully!', 'success');
+        showMessage(t('user.created'), 'success');
       }
       setFormData({ name: '', email: '', phone: '' });
       setEditingId(null);
       fetchUsers();
     } catch (error) {
-      showMessage('Operation failed: ' + error.message, 'danger');
+      showMessage(t('user.failed') + ': ' + error.message, 'danger');
     } finally {
       setLoading(false);
     }
@@ -67,14 +67,14 @@ function Dashboard({ onLogout, username }) {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    if (window.confirm(t('user.confirmDelete'))) {
       setLoading(true);
       try {
         await axios.delete(`${API_BASE_URL}/users/${id}`);
-        showMessage('User deleted successfully!', 'success');
+        showMessage(t('user.deleted'), 'success');
         fetchUsers();
       } catch (error) {
-        showMessage('Delete failed: ' + error.message, 'danger');
+        showMessage(t('user.deleteFailed') + ': ' + error.message, 'danger');
       } finally {
         setLoading(false);
       }
@@ -140,7 +140,7 @@ function Dashboard({ onLogout, username }) {
               className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
               onClick={() => setActiveTab('users')}
             >
-              {t('nav.welcome')}, {username}
+              {t('user.title')}
             </button>
           </li>
           <li className="nav-item">
@@ -223,7 +223,7 @@ function Dashboard({ onLogout, username }) {
                         className="btn btn-secondary"
                         onClick={handleCancel}
                       >
-                        t('user.cancel')
+                        {t('user.cancel')}
                       </button>
                     )}
                   </div>
@@ -260,7 +260,7 @@ function Dashboard({ onLogout, username }) {
                         {users.length === 0 ? (
                           <tr>
                             <td colSpan="5" className="text-center">
-                              t('user.noUsers')
+                              {t('user.noUsers')}
                             </td>
                           </tr>
                         ) : (

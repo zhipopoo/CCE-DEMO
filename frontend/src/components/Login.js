@@ -45,8 +45,8 @@ function Login({ onLogin }) {
                   <circle cx="30" cy="30" r="8" fill="#2563eb"/>
                 </svg>
               </div>
-              <h1>t('login.title')</h1>
-              <p className="subtitle">t('login.subtitle')</p>
+              <h1>{t('login.title')}</h1>
+              <p className="subtitle">{t('login.subtitle')}</p>
             </div>
           </div>
 
@@ -97,8 +97,8 @@ function Login({ onLogin }) {
         <div className="login-right">
           <div className="login-form-container">
             <div className="login-form-header">
-              <h2>t('login.welcome')</h2>
-              <p>t('login.signIn')</p>
+              <h2>{t('login.welcome')}</h2>
+              <p>{t('login.signIn')}</p>
             </div>
 
             {error && (
@@ -109,7 +109,7 @@ function Login({ onLogin }) {
 
             <form onSubmit={handleSubmit} className="login-form">
               <div className="form-group">
-                <label htmlFor="username">Username</label>
+                <label htmlFor="username">{t('login.username')}</label>
                 <div className="input-group">
                   <span className="input-icon">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -123,14 +123,14 @@ function Login({ onLogin }) {
                     name="username"
                     value={credentials.username}
                     onChange={handleChange}
-                    placeholder="t('login.username')"
+                    placeholder={t('login.username')}
                     required
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">{t('login.password')}</label>
                 <div className="input-group">
                   <span className="input-icon">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -144,7 +144,7 @@ function Login({ onLogin }) {
                     name="password"
                     value={credentials.password}
                     onChange={handleChange}
-                    placeholder="t('login.password')"
+                    placeholder={t('login.password')}
                     required
                   />
                 </div>
@@ -155,7 +155,7 @@ function Login({ onLogin }) {
               </button>
 
               <div className="login-footer">
-                <p>t('login.demo')</p>
+                <p>{t('login.demo')}</p>
               </div>
             </form>
           </div>

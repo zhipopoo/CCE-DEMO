@@ -25,7 +25,7 @@ function FileUpload() {
       const response = await axios.get(`${API_BASE_URL}/files/list`);
       setFiles(response.data);
     } catch (error) {
-      showMessage('Failed to fetch files: ' + error.message, 'danger');
+      showMessage(t('file.fetchFailed') + ': ' + error.message, 'danger');
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ function FileUpload() {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      showMessage('Please select a file first', 'warning');
+      showMessage(t('file.selectFirst'), 'warning');
       return;
     }
 
@@ -64,13 +64,13 @@ function FileUpload() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      showMessage(`File uploaded successfully: ${response.data.originalFilename}`, 'success');
+      showMessage(t('file.uploadSuccess') + `: ${response.data.originalFilename}`, 'success');
       setSelectedFile(null);
       // Reset file input
       document.getElementById('file-input').value = '';
       fetchFiles();
     } catch (error) {
-      showMessage('Upload failed: ' + (error.response?.data?.message || error.message), 'danger');
+      showMessage(t('file.uploadFailed') + ': ' + (error.response?.data?.message || error.message), 'danger');
     } finally {
       setUploading(false);
     }
@@ -90,18 +90,18 @@ function FileUpload() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      showMessage('Download failed: ' + error.message, 'danger');
+      showMessage(t('file.downloadFailed') + ': ' + error.message, 'danger');
     }
   };
 
   const handleDelete = async (filename) => {
-    if (window.confirm(`Are you sure you want to delete ${filename}?`)) {
+    if (window.confirm(t('file.confirmDelete') + ` ${filename}?`)) {
       try {
         await axios.delete(`${API_BASE_URL}/files/delete/${filename}`);
-        showMessage('File deleted successfully', 'success');
+        showMessage(t('file.deleteSuccess'), 'success');
         fetchFiles();
       } catch (error) {
-        showMessage('Delete failed: ' + error.message, 'danger');
+        showMessage(t('file.deleteFailed') + ': ' + error.message, 'danger');
       }
     }
   };
@@ -138,16 +138,16 @@ function FileUpload() {
           </div>
           <div className="mount-info-body">
             <div className="mount-info-item">
-              <span className="label">{t("mount.type")}:</span>
-              <span className="value">{mountInfo.mountType === 'obs' ? t("mount.obs") : "Local File System"}</span>
+              <span className="label">{t('mount.type')}:</span>
+              <span className="value">{mountInfo.mountType === 'obs' ? t('mount.obs') : t('mount.local')}</span>
             </div>
             <div className="mount-info-item">
-              <span className="label">{t("mount.path")}:</span>
+              <span className="label">{t('mount.path')}:</span>
               <span className="value">{mountInfo.uploadDir}</span>
             </div>
             {mountInfo.absolutePath && (
               <div className="mount-info-item">
-                <span className="label">绝对路径:</span>
+                <span className="label">{t('mount.absolutePath')}:</span>
                 <span className="value">{mountInfo.absolutePath}</span>
               </div>
             )}
@@ -184,7 +184,7 @@ function FileUpload() {
           {uploading ? (
             <>
               <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              上传中...
+              {t('file.uploading')}
             </>
           ) : (
             <>
@@ -213,7 +213,7 @@ function FileUpload() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-1">
               <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
             </svg>
-            t('file.refresh')
+            {t('file.refresh')}
           </button>
         </div>
         
@@ -228,7 +228,7 @@ function FileUpload() {
             <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
             </svg>
-            <p>t('file.noFiles')</p>
+            <p>{t('file.noFiles')}</p>
           </div>
         ) : (
           <div className="table-responsive">
@@ -257,13 +257,13 @@ function FileUpload() {
                         className="btn btn-sm btn-primary me-2"
                         onClick={() => handleDownload(file.filename)}
                       >
-                        t('file.download')
+                        {t('file.download')}
                       </button>
                       <button
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDelete(file.filename)}
                       >
-                        t('file.delete')
+                        {t('file.delete')}
                       </button>
                     </td>
                   </tr>

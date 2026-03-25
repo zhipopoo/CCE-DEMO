@@ -37,6 +37,8 @@ const resources = {
       'user.failed': 'Operation failed',
       'user.confirmDelete': 'Are you sure you want to delete this user?',
       'user.cancel': 'Cancel',
+      'user.fetchFailed': 'Failed to fetch users',
+      'user.deleteFailed': 'Delete failed',
       
       // File Management
       'file.title': 'File Management',
@@ -57,6 +59,9 @@ const resources = {
       'file.deleteSuccess': 'File deleted successfully',
       'file.deleteFailed': 'Delete failed',
       'file.confirmDelete': 'Are you sure you want to delete',
+      'file.fetchFailed': 'Failed to fetch files',
+      'file.selectFirst': 'Please select a file first',
+      'file.downloadFailed': 'Download failed',
       
       // Mount Info
       'mount.title': 'Storage Mount Info',
@@ -109,6 +114,8 @@ const resources = {
       'user.failed': '操作失败',
       'user.confirmDelete': '确定要删除此用户吗？',
       'user.cancel': '取消',
+      'user.fetchFailed': '获取用户失败',
+      'user.deleteFailed': '删除失败',
       
       // File Management
       'file.title': '文件管理',
@@ -129,6 +136,9 @@ const resources = {
       'file.deleteSuccess': '文件删除成功',
       'file.deleteFailed': '删除失败',
       'file.confirmDelete': '确定要删除',
+      'file.fetchFailed': '获取文件失败',
+      'file.selectFirst': '请先选择文件',
+      'file.downloadFailed': '下载失败',
       
       // Mount Info
       'mount.title': '存储挂载信息',
