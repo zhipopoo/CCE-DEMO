@@ -31,8 +31,12 @@ services:
       DB_NAME: ccedemo
       DB_USER: cceuser
       DB_PASSWORD: cceuser-password
+      FILE_MOUNT_TYPE: local
+      FILE_UPLOAD_DIR: /app/uploads
     ports:
       - "8080:8080"
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       mysql:
         condition: service_healthy

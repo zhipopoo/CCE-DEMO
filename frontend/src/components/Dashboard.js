@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import FileUpload from './FileUpload';
 import './Dashboard.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 function Dashboard({ onLogout, username }) {
   const [users, setUsers] = useState([]);
+  const [activeTab, setActiveTab] = useState('users');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -127,6 +129,36 @@ function Dashboard({ onLogout, username }) {
       </nav>
 
       <div className="container mt-4">
+        {/* Tab Navigation */}
+        <ul className="nav nav-tabs mb-4">
+          <li className="nav-item">
+            <button
+              className={`nav-link ${activeTab === 'users' ? 'active' : ''}`}
+              onClick={() => setActiveTab('users')}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
+              用户管理
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link ${activeTab === 'files' ? 'active' : ''}`}
+              onClick={() => setActiveTab('files')}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="me-2">
+                <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+              </svg>
+              文件管理
+            </button>
+          </li>
+        </ul>
+
+        {activeTab === 'files' ? (
+          <FileUpload />
+        ) : (
+        <>
         {message.text && (
           <div className={`alert alert-${message.type} alert-dismissible fade show`} role="alert">
             {message.text}
@@ -262,6 +294,8 @@ function Dashboard({ onLogout, username }) {
             </div>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

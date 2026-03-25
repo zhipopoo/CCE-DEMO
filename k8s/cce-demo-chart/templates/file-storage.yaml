@@ -1,0 +1,29 @@
+{{- if eq .Values.fileStorage.mountType "obs" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.fileStorage.obs.pvcName }}
+  namespace: {{ .Values.namespace.name }}
+  annotations:
+    everest.io/obs-volume-type: "{{ .Values.fileStorage.obs.volumeType }}"
+    everest.io/csi.volume-name-prefix: "{{ .Values.fileStorage.obs.volumeNamePrefix }}"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.fileStorage.obs.capacity }}
+  storageClassName: csi-obs
+---
+# Secret for OBS credentials (if not using IAM agency)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: obs-credentials
+  namespace: {{ .Values.namespace.name }}
+type: Opaque
+stringData:
+  access-key: {{ .Values.fileStorage.obs.accessKey }}
+  secret-key: {{ .Values.fileStorage.obs.secretKey }}
+---
+{{- end }}

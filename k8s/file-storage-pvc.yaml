@@ -1,0 +1,19 @@
+# OBS Dynamic Storage PVC for Huawei Cloud CCE
+# CCE will automatically create an OBS bucket
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-storage-pvc
+  namespace: cce-demo
+  annotations:
+    # OBS type: STANDARD or WARM
+    everest.io/obs-volume-type: "STANDARD"
+    # Storage volume name prefix
+    everest.io/csi.volume-name-prefix: "cce-demo"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: csi-obs
