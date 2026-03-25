@@ -19,6 +19,7 @@ A complete cloud-native microservice demo project designed for Huawei Cloud CCE 
 - **Bootstrap 5** - Responsive design framework
 - **Axios** - HTTP client for API calls
 - **React Router** - Client-side routing
+- **React i18next** - Internationalization (i18n) support
 - **Custom Theme System** - Unified business-style design
 
 ### Backend
@@ -34,6 +35,7 @@ A complete cloud-native microservice demo project designed for Huawei Cloud CCE 
 - **Kubernetes** - Container orchestration
 - **Helm** - Kubernetes package manager
 - **Huawei Cloud CCE** - Managed Kubernetes service
+- **Huawei Cloud OBS** - Object Storage Service for file storage
 - **SWR** - Container registry
 
 ## Features
@@ -42,18 +44,22 @@ A complete cloud-native microservice demo project designed for Huawei Cloud CCE 
 - Professional login interface with authentication
 - Docker and Kubernetes technology showcase
 - Complete CRUD operations for user management
+- File upload and management with OBS storage support
 - Responsive web interface with business-style design
+- Internationalization (i18n) support - Chinese/English language switching
 - Chinese character support (UTF-8 encoding)
 - Session management with localStorage
 
 ### Technical Features
 - Health checks and monitoring endpoints
 - Load balancing support
-- Persistent storage for database
+- Persistent storage for database and file uploads
+- OBS (Object Storage Service) integration for cloud storage
 - Production-ready Docker images
 - Kubernetes manifests for CCE deployment
-- Helm chart for easy deployment
+- Helm chart for easy deployment with configurable parameters
 - CI/CD pipeline with Jenkins
+- OBS credentials managed via Helm templates
 
 ## Project Structure
 
@@ -88,10 +94,14 @@ CCE-Demo/
 │   ├── mysql-*.yaml            # MySQL resources
 │   ├── backend-*.yaml          # Backend resources
 │   ├── frontend-*.yaml         # Frontend resources
+│   ├── file-storage-pvc.yaml   # OBS storage PVC
+│   ├── obs-secret.yaml         # OBS credentials secret
 │   └── cce-demo-chart/         # Helm chart
 │       ├── Chart.yaml          # Chart metadata
 │       ├── values.yaml         # Default values
 │       └── templates/          # Template files
+│           ├── obs-secret.yaml # OBS secret template
+│           └── ...
 ├── mysql-init/                  # Database initialization
 │   └── 01-init.sql             # Init script with sample data
 ├── docker-compose.yml           # Local development setup
@@ -219,13 +229,15 @@ kubectl wait --for=condition=ready pod -l app=frontend -n cce-demo --timeout=300
 # Update image repositories and other configurations
 ```
 
-2. Deploy with Helm:
+2. Deploy with Helm (with OBS credentials):
 ```bash
 helm install cce-demo k8s/cce-demo-chart \
   --namespace cce-demo \
   --create-namespace \
   --set backend.image=<swr-endpoint>/<namespace>/cce-demo-backend:latest \
-  --set frontend.image=<swr-endpoint>/<namespace>/cce-demo-frontend:latest
+  --set frontend.image=<swr-endpoint>/<namespace>/cce-demo-frontend:latest \
+  --set fileStorage.obs.accessKey=<YOUR_OBS_ACCESS_KEY> \
+  --set fileStorage.obs.secretKey=<YOUR_OBS_SECRET_KEY>
 ```
 
 3. Upgrade deployment:
@@ -236,6 +248,18 @@ helm upgrade cce-demo k8s/cce-demo-chart \
   --set frontend.image=<swr-endpoint>/<namespace>/cce-demo-frontend:<new-tag>
 ```
 
+#### OBS Storage Configuration
+
+The Helm chart supports OBS (Object Storage Service) for file storage:
+
+- **Storage Type**: Configured via `fileStorage.mountType` (default: "obs")
+- **PVC Name**: `fileStorage.obs.pvcName` (default: "backend-storage-pvc")
+- **Storage Class**: `csi-obs` (Huawei Cloud OBS CSI driver)
+- **Filesystem Type**: `s3fs` (configured via `csi.storage.k8s.io/fstype`)
+- **Volume Type**: `STANDARD` (can be set to `WARM` for lower cost)
+
+OBS credentials are automatically created as a Kubernetes Secret by the Helm template.
+
 ### Method 3: CI/CD with Jenkins
 
 The project includes a Jenkinsfile for automated CI/CD:
@@ -243,14 +267,17 @@ The project includes a Jenkinsfile for automated CI/CD:
 1. Configure Jenkins credentials:
    - `docker-registry-credentials`: Docker registry username/password
    - `kubeconfig-file`: Kubernetes configuration file
+   - `obs-credentials`: OBS access key and secret key
 
 2. Create a Jenkins pipeline using the Jenkinsfile
 
 3. The pipeline will:
    - Build Docker images
    - Push images to SWR
-   - Deploy to CCE using Helm
+   - Deploy to CCE using Helm with OBS credentials
    - Verify deployment status
+
+**Note**: OBS credentials are now managed by Helm templates, eliminating the need for manual kubectl commands in the Jenkinsfile.
 
 ### Access the Application
 
@@ -280,6 +307,14 @@ kubectl get svc frontend-service -n cce-demo
 - `PUT /api/users/{id}` - Update user
 - `DELETE /api/users/{id}` - Delete user
 
+### File Management
+
+- `GET /api/files/list` - List all uploaded files
+- `POST /api/files/upload` - Upload a file
+- `GET /api/files/download/{filename}` - Download a file
+- `DELETE /api/files/delete/{filename}` - Delete a file
+- `GET /api/files/mount-info` - Get storage mount information
+
 ### Health Check
 
 - `GET /actuator/health` - Application health status
@@ -297,6 +332,7 @@ kubectl get svc frontend-service -n cce-demo
 - `DB_NAME` - Database name (default: ccedemo)
 - `DB_USER` - Database user (default: root)
 - `DB_PASSWORD` - Database password (default: password)
+- `FILE_MOUNT_TYPE` - File storage type (default: obs, options: obs, local)
 
 #### Frontend
 
@@ -449,6 +485,15 @@ For issues and questions:
 4. Open an issue in the repository
 
 ## Changelog
+
+### Version 1.1.0
+- Added internationalization (i18n) support with Chinese/English language switching
+- Integrated OBS (Object Storage Service) for file storage
+- Added file upload and management features
+- Improved Helm chart with OBS secret template
+- Updated Kubernetes configurations for OBS storage
+- Enhanced CI/CD pipeline with automated OBS credential management
+- Updated README with OBS and i18n documentation
 
 ### Version 1.0.0
 - Initial release
