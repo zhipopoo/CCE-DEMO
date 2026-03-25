@@ -13,6 +13,8 @@ spec:
       labels:
         app: backend
     spec:
+      imagePullSecrets:
+        - name: default-secret
       containers:
       - name: backend
         image: swr.ap-southeast-1.myhuaweicloud.com/andy-demo/cce-demo-backend:latest
@@ -39,25 +41,10 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: mysql-password
-        # File storage - OBS with AK/SK
         - name: FILE_MOUNT_TYPE
           value: "obs"
-        - name: OBS_BUCKET
-          value: "cce-demo-files"
-        - name: OBS_ENDPOINT
-          value: "obs.ap-southeast-1.myhuaweicloud.com"
-        - name: OBS_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: obs-credentials
-              key: access-key
-        - name: OBS_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: obs-credentials
-              key: secret-key
         volumeMounts:
-        - name: obs-volume
+        - name: obs-storage
           mountPath: /app/uploads
         livenessProbe:
           httpGet:
@@ -81,8 +68,6 @@ spec:
             memory: "512Mi"
             cpu: "500m"
       volumes:
-      - name: obs-volume
+      - name: obs-storage
         persistentVolumeClaim:
           claimName: backend-storage-pvc
-      imagePullSecrets:
-        - name: default-secret

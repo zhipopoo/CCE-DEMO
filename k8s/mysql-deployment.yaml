@@ -72,7 +72,7 @@ spec:
             - sh
             - -c
             - "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}"
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
@@ -84,9 +84,9 @@ spec:
             - sh
             - -c
             - "mysql -h 127.0.0.1 -u root -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1'"
-          initialDelaySeconds: 30
-          periodSeconds: 5
-          timeoutSeconds: 2
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
           failureThreshold: 3
 
         # Resource limits and requests

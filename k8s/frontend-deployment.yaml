@@ -13,6 +13,8 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - name: default-secret
       containers:
       - name: frontend
         image: swr.ap-southeast-1.myhuaweicloud.com/andy-demo/cce-demo-frontend:latest
@@ -34,5 +36,3 @@ spec:
       - name: nginx-config
         configMap:
           name: frontend-nginx-config
-      imagePullSecrets:
-        - name: default-secret

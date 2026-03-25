@@ -1,18 +1,13 @@
 # OBS Storage PVC for Huawei Cloud CCE
-# Using OBS with AK/SK (pre-created secret)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: backend-storage-pvc
   namespace: cce-demo
   annotations:
-    # OBS type: STANDARD or WARM
     everest.io/obs-volume-type: "STANDARD"
-    # Storage volume name prefix
     everest.io/csi.volume-name-prefix: "cce-demo"
-    # OBS instance type
-    csi.storage.k8s.io/fstype: "obsfs"
-    # Custom secret for OBS credentials
+    csi.storage.k8s.io/fstype: "s3fs"
     csi.storage.k8s.io/node-publish-secret-name: "obs-credentials"
     csi.storage.k8s.io/node-publish-secret-namespace: "cce-demo"
 spec:
