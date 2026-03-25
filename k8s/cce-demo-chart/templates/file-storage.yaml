@@ -15,15 +15,4 @@ spec:
       storage: {{ .Values.fileStorage.obs.capacity }}
   storageClassName: csi-obs
 ---
-# Secret for OBS credentials (if not using IAM agency)
-apiVersion: v1
-kind: Secret
-metadata:
-  name: obs-credentials
-  namespace: {{ .Values.namespace.name }}
-type: Opaque
-stringData:
-  access-key: {{ .Values.fileStorage.obs.accessKey }}
-  secret-key: {{ .Values.fileStorage.obs.secretKey }}
----
 {{- end }}
