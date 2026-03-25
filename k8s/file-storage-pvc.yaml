@@ -1,5 +1,5 @@
-# OBS Dynamic Storage PVC for Huawei Cloud CCE
-# CCE will automatically create an OBS bucket
+# OBS Storage PVC for Huawei Cloud CCE
+# Using OBS with AK/SK credentials
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -10,6 +10,11 @@ metadata:
     everest.io/obs-volume-type: "STANDARD"
     # Storage volume name prefix
     everest.io/csi.volume-name-prefix: "cce-demo"
+    # OBS instance type
+    csi.storage.k8s.io/fstype: "obsfs"
+    # Custom secret for OBS credentials
+    csi.storage.k8s.io/node-publish-secret-name: "obs-credentials"
+    csi.storage.k8s.io/node-publish-secret-namespace: "cce-demo"
 spec:
   accessModes:
     - ReadWriteMany
@@ -17,3 +22,14 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: csi-obs
+---
+# OBS Credentials Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: obs-credentials
+  namespace: cce-demo
+type: Opaque
+stringData:
+  access-key: YOUR_OBS_ACCESS_KEY
+  secret-key: YOUR_OBS_SECRET_KEY

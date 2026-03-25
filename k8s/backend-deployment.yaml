@@ -39,24 +39,23 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: mysql-password
-        # File storage - just set mount type for dynamic OBS
+        # File storage - OBS with AK/SK
         - name: FILE_MOUNT_TYPE
           value: "obs"
-        # To use AK/SK, uncomment below
-        # - name: OBS_BUCKET
-        #   value: "your-bucket-name"
-        # - name: OBS_ENDPOINT
-        #   value: "obs.ap-southeast-1.myhuaweicloud.com"
-        # - name: OBS_ACCESS_KEY
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: obs-credentials
-        #       key: access-key
-        # - name: OBS_SECRET_KEY
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: obs-credentials
-        #       key: secret-key
+        - name: OBS_BUCKET
+          value: "cce-demo-files"
+        - name: OBS_ENDPOINT
+          value: "obs.ap-southeast-1.myhuaweicloud.com"
+        - name: OBS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: obs-credentials
+              key: access-key
+        - name: OBS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: obs-credentials
+              key: secret-key
         volumeMounts:
         - name: obs-volume
           mountPath: /app/uploads
