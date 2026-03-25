@@ -100,6 +100,17 @@ pipeline {
                                 --from-literal=secret-key=${OBS_SECRET_KEY} \
                                 --dry-run=client -o yaml | kubectl --kubeconfig ${KUBECONFIG} apply -f -
 
+                            # Create OBS credentials secret with base64 encoding
+                            # Secret type must be: cfe/secure-opaque
+                            # Labels must include: secret.kubernetes.io/used-by: csi
+                            kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
+                                --namespace ${KUBE_NAMESPACE} \
+                                --from-literal=access.key=$(echo -n ${OBS_ACCESS_KEY} | base64) \
+                                --from-literal=secret.key=$(echo -n ${OBS_SECRET_KEY} | base64) \
+                                --labels=secret.kubernetes.io/used-by=csi \
+                                --type=cfe/secure-opaque \
+                                --dry-run=client -o yaml | kubectl --kubeconfig ${KUBECONFIG} apply -f -
+
                             # Update Helm dependencies
                             helm dependency update ${HELM_CHART_PATH} || true
 
@@ -158,7 +169,14 @@ pipeline {
         success {
             echo 'Deployment successful!'
             script {
-                withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                withCredentials([
+                        file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG'),
+                        usernamePassword(
+                            credentialsId: 'obs-credentials',
+                            usernameVariable: 'OBS_ACCESS_KEY',
+                            passwordVariable: 'OBS_SECRET_KEY'
+                        )
+                    ]) {
                     sh '''
                         echo "Application deployed successfully!"
                         kubectl --kubeconfig ${KUBECONFIG} get pods -n ${KUBE_NAMESPACE} || true
@@ -169,7 +187,14 @@ pipeline {
         failure {
             echo 'Deployment failed!'
             script {
-                withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                withCredentials([
+                        file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG'),
+                        usernamePassword(
+                            credentialsId: 'obs-credentials',
+                            usernameVariable: 'OBS_ACCESS_KEY',
+                            passwordVariable: 'OBS_SECRET_KEY'
+                        )
+                    ]) {
                     sh '''
                         echo "Checking pod status for debugging..."
                         kubectl --kubeconfig ${KUBECONFIG} get pods -n ${KUBE_NAMESPACE} || true
