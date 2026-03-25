@@ -93,13 +93,6 @@ pipeline {
                             kubectl --kubeconfig ${KUBECONFIG} get namespace ${KUBE_NAMESPACE} || \
                             kubectl --kubeconfig ${KUBECONFIG} create namespace ${KUBE_NAMESPACE}
 
-                            # Create OBS credentials secret
-                            kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
-                                --namespace ${KUBE_NAMESPACE} \
-                                --from-literal=access-key=${OBS_ACCESS_KEY} \
-                                --from-literal=secret-key=${OBS_SECRET_KEY} \
-                                --dry-run=client -o yaml | kubectl --kubeconfig ${KUBECONFIG} apply -f -
-
                             # Create OBS credentials secret with base64 encoding
                             kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
                                 --namespace ${KUBE_NAMESPACE} \
