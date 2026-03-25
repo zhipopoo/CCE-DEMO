@@ -125,4 +125,11 @@ fileStorage:
     volumeType: "STANDARD"
     volumeNamePrefix: "cce-demo"
     secretName: "obs-credentials"
+    # OBS credentials (should be set via Helm --set or values override)
+    accessKey: ""
+    secretKey: ""
+    # CSI storage class parameters
+    storageClass:
+      parameters:
+        csi.storage.k8s.io/fstype: "obsfs"
    

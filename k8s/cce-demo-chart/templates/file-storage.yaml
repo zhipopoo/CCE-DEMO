@@ -9,7 +9,11 @@ metadata:
     {{- if .Values.fileStorage.obs.volumeNamePrefix }}
     everest.io/csi.volume-name-prefix: "{{ .Values.fileStorage.obs.volumeNamePrefix }}"
     {{- end }}
-    csi.storage.k8s.io/fstype: "obsfs"
+    {{- if .Values.fileStorage.obs.storageClass.parameters }}
+    {{- range $key, $value := .Values.fileStorage.obs.storageClass.parameters }}
+    {{ $key }}: "{{ $value }}"
+    {{- end }}
+    {{- end }}
     csi.storage.k8s.io/node-publish-secret-name: {{ .Values.fileStorage.obs.secretName }}
     csi.storage.k8s.io/node-publish-secret-namespace: {{ .Values.namespace.name }}
 spec:

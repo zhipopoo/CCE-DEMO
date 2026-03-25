@@ -93,34 +93,20 @@ pipeline {
                             kubectl --kubeconfig ${KUBECONFIG} get namespace ${KUBE_NAMESPACE} || \
                             kubectl --kubeconfig ${KUBECONFIG} create namespace ${KUBE_NAMESPACE}
 
-                            # Create OBS credentials secret with base64 encoding
-                            # Secret type: cfe/secure-opaque
-                            # Data keys: access.key, secret.key (base64 encoded)
-                            # Labels added via kubectl label command
-                            kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
-                                --namespace ${KUBE_NAMESPACE} \
-                                --from-literal=access.key=$(echo -n ${OBS_ACCESS_KEY} | base64) \
-                                --from-literal=secret.key=$(echo -n ${OBS_SECRET_KEY} | base64) \
-                                --type=cfe/secure-opaque \
-                                --dry-run=client -o yaml | kubectl --kubeconfig ${KUBECONFIG} apply -f -
-                            
-                            # Add label to secret
-                            kubectl --kubeconfig ${KUBECONFIG} label secret obs-credentials \
-                                --namespace ${KUBE_NAMESPACE} \
-                                secret.kubernetes.io/used-by=csi || true
-
                             # Update Helm dependencies
                             helm dependency update ${HELM_CHART_PATH} || true
 
                             # Deploy using Helm
                             # For CI runs we default the frontend service to ClusterIP to avoid long LoadBalancer provisioning
+                            # OBS credentials are now managed by Helm template
                             helm upgrade --install ${HELM_RELEASE} ${HELM_CHART_PATH} \
                                 --kubeconfig ${KUBECONFIG} \
                                 --namespace ${KUBE_NAMESPACE} \
                                 --set backend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${BACKEND_IMAGE}:${IMAGE_TAG} \
                                 --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
                                 --set frontend.service.type=ClusterIP \
-                                --set fileStorage.obs.secretName=obs-credentials \
+                                --set fileStorage.obs.accessKey=${OBS_ACCESS_KEY} \
+                                --set fileStorage.obs.secretKey=${OBS_SECRET_KEY} \
                                 --wait \
                                 --timeout 10m
                         '''
