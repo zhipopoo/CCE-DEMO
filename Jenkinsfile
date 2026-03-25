@@ -80,11 +80,25 @@ pipeline {
             steps {
                 echo 'Deploying to Kubernetes using Helm...'
                 script {
-                    withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                    withCredentials([
+                        file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG'),
+                        usernamePassword(
+                            credentialsId: 'obs-credentials',
+                            usernameVariable: 'OBS_ACCESS_KEY',
+                            passwordVariable: 'OBS_SECRET_KEY'
+                        )
+                    ]) {
                         sh '''
                             # Ensure namespace exists
                             kubectl --kubeconfig ${KUBECONFIG} get namespace ${KUBE_NAMESPACE} || \
                             kubectl --kubeconfig ${KUBECONFIG} create namespace ${KUBE_NAMESPACE}
+
+                            # Create OBS credentials secret
+                            kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
+                                --namespace ${KUBE_NAMESPACE} \
+                                --from-literal=access-key=${OBS_ACCESS_KEY} \
+                                --from-literal=secret-key=${OBS_SECRET_KEY} \
+                                --dry-run=client -o yaml | kubectl --kubeconfig ${KUBECONFIG} apply -f -
 
                             # Update Helm dependencies
                             helm dependency update ${HELM_CHART_PATH} || true
@@ -97,6 +111,7 @@ pipeline {
                                 --set backend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${BACKEND_IMAGE}:${IMAGE_TAG} \
                                 --set frontend.image=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${FRONTEND_IMAGE}:${IMAGE_TAG} \
                                 --set frontend.service.type=ClusterIP \
+                                --set fileStorage.obs.secretName=obs-credentials \
                                 --wait \
                                 --timeout 10m
                         '''
@@ -109,7 +124,14 @@ pipeline {
             steps {
                 echo 'Verifying deployment...'
                 script {
-                    withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
+                    withCredentials([
+                        file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG'),
+                        usernamePassword(
+                            credentialsId: 'obs-credentials',
+                            usernameVariable: 'OBS_ACCESS_KEY',
+                            passwordVariable: 'OBS_SECRET_KEY'
+                        )
+                    ]) {
                         sh '''
                             kubectl --kubeconfig ${KUBECONFIG} get pods -n ${KUBE_NAMESPACE}
                             kubectl --kubeconfig ${KUBECONFIG} get services -n ${KUBE_NAMESPACE}

@@ -112,7 +112,7 @@ frontend:
 # File Storage Configuration
 fileStorage:
   # Mount type: "local" or "obs"
-  mountType: "local"
+  mountType: "obs"
   
   # Local storage configuration (for docker-compose or single node k8s)
   local:
@@ -121,6 +121,10 @@ fileStorage:
   # OBS (Object Storage Service) configuration (for cloud k8s)
   obs:
     pvcName: "backend-storage-pvc"
+    capacity: "1Gi"
+    volumeType: "STANDARD"
+    volumeNamePrefix: "cce-demo"
+    secretName: "obs-credentials"
     capacity: "1Gi"
     volumeType: "STANDARD"
     volumeNamePrefix: "cce-demo"

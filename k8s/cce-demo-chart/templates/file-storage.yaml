@@ -6,7 +6,12 @@ metadata:
   namespace: {{ .Values.namespace.name }}
   annotations:
     everest.io/obs-volume-type: "{{ .Values.fileStorage.obs.volumeType }}"
+    {{- if .Values.fileStorage.obs.volumeNamePrefix }}
     everest.io/csi.volume-name-prefix: "{{ .Values.fileStorage.obs.volumeNamePrefix }}"
+    {{- end }}
+    csi.storage.k8s.io/fstype: "obsfs"
+    csi.storage.k8s.io/node-publish-secret-name: {{ .Values.fileStorage.obs.secretName }}
+    csi.storage.k8s.io/node-publish-secret-namespace: {{ .Values.namespace.name }}
 spec:
   accessModes:
     - ReadWriteMany
