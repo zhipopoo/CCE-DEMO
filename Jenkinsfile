@@ -80,25 +80,11 @@ pipeline {
             steps {
                 echo 'Deploying to Kubernetes using Helm...'
                 script {
-                    withCredentials([
-                        file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG'),
-                        usernamePassword(
-                            credentialsId: 'obs-credentials',
-                            usernameVariable: 'OBS_ACCESS_KEY',
-                            passwordVariable: 'OBS_SECRET_KEY'
-                        )
-                    ]) {
+                    withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
                         sh '''
                             # Ensure namespace exists
                             kubectl --kubeconfig ${KUBECONFIG} get namespace ${KUBE_NAMESPACE} || \
                             kubectl --kubeconfig ${KUBECONFIG} create namespace ${KUBE_NAMESPACE}
-
-                            # Create OBS credentials secret if using OBS storage
-                            kubectl --kubeconfig ${KUBECONFIG} create secret generic obs-credentials \
-                                --namespace ${KUBE_NAMESPACE} \
-                                --from-literal=access-key=${OBS_ACCESS_KEY} \
-                                --from-literal=secret-key=${OBS_SECRET_KEY} \
-                                --dry-run=client -o yaml | kubectl --kubeconfig ${KUBECONFIG} apply -f -
 
                             # Update Helm dependencies
                             helm dependency update ${HELM_CHART_PATH} || true
